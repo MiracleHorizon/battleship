@@ -1,0 +1,13 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100dvw;
+  height: 100dvh;
+}
+
+.map {
+  display: flex;
+  gap: 4px;
+  transform: rotate(-90deg) scale(-1, 1);
+}

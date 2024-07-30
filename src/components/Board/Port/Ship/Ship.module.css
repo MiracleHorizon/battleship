@@ -1,0 +1,23 @@
+.root {
+  --size: 0;
+
+  height: var(--cell-size);
+  width: calc(var(--size) * var(--cell-size));
+  /*outline: 1px solid rgb(40, 40, 40);*/
+  /*outline-offset: -1px;*/
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cell {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--cell-size);
+  width: var(--cell-size);
+  background-color: rgb(40, 40, 40);
+  color: royalblue;
+}

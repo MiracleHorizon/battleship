@@ -1,0 +1,11 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.berth {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}

@@ -1,0 +1,14 @@
+.root {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  outline: 1px solid black;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: red;
+  font-size: 40px;
+  text-align: center;
+}
