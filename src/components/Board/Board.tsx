@@ -34,10 +34,10 @@ export const Board = () => {
   return (
     <div className={styles.root}>
       <DragContextProvider value={{ ship: dragShip, setShip: setDragShip, dropShip }}>
-        <Port fleet={board.getFleet()} />
+        <Port fleet={board.fleet} />
 
         <div className={styles.map}>
-          {board.getCells().map((cellRow, index) => (
+          {board.cells.map((cellRow, index) => (
             <div key={index}>
               {cellRow.map(cell => (
                 <Cell

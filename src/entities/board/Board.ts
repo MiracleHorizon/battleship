@@ -5,16 +5,9 @@ import { GameMode } from './GameMode.enum.ts'
 
 export class Board {
   private isGameStarted: boolean
-  private readonly cells: Cell[][]
-  private readonly fleet: Fleet
 
-  public getCells(): Cell[][] {
-    return this.cells
-  }
-
-  public getFleet(): Fleet {
-    return this.fleet
-  }
+  public readonly cells: Cell[][]
+  public readonly fleet: Fleet
 
   constructor() {
     this.cells = this.createCells()
