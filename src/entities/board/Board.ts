@@ -78,7 +78,7 @@ export class Board {
         if (cellCol !== cell.column) {
           continue
         }
-        if (cellCol + right > row.length - 1 || cellCol - left < 0) {
+        if (cell.isReserved || cellCol + right > row.length - 1 || cellCol - left < 0) {
           return false
         }
 
@@ -148,7 +148,11 @@ export class Board {
         for (let col = 0; col < prevRow.length; col++) {
           const cell = prevRow[col]
 
-          if (cell.column >= firstCell.column - 1 && cell.column <= lastCell.column + 1) {
+          if (
+            cell.isEmpty &&
+            cell.column >= firstCell.column - 1 &&
+            cell.column <= lastCell.column + 1
+          ) {
             cell.reserve()
           }
         }
@@ -162,13 +166,19 @@ export class Board {
         // Reserve prev cell if exists
         if (cell.column === firstCell.column && cell.column !== 0) {
           const prevCell = currRow[col - 1]
-          prevCell.reserve()
+
+          if (prevCell.isEmpty) {
+            prevCell.reserve()
+          }
         }
 
         // Reserve next cell if exists
         if (cell.column === lastCell.column && cell.column !== currRow.length - 1) {
           const nextCell = currRow[col + 1]
-          nextCell.reserve()
+
+          if (nextCell.isEmpty) {
+            nextCell.reserve()
+          }
         }
       }
 
@@ -179,7 +189,11 @@ export class Board {
         for (let col = 0; col < nextRow.length; col++) {
           const cell = nextRow[col]
 
-          if (cell.column >= firstCell.column - 1 && cell.column <= lastCell.column + 1) {
+          if (
+            cell.isEmpty &&
+            cell.column >= firstCell.column - 1 &&
+            cell.column <= lastCell.column + 1
+          ) {
             cell.reserve()
           }
         }
