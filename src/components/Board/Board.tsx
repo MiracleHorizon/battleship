@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Cell } from './Cell'
 import { Port } from './Port'
 import { DragContextProvider, type DragShip } from '@/context/DragContext.tsx'
+import { ShipOrientation } from '@/entities/board/figures/Ship.ts'
 import { Board as BoardEntity, Cell as CellEntity } from '@/entities/board'
 import styles from './Board.module.css'
 
@@ -15,11 +16,13 @@ export const Board = () => {
 
   const dropShip = useCallback(
     (ship: DragShip, cell: CellEntity) => {
-      const middle = ship.shipCellOrder + 1
-      const right = Math.abs(middle - ship.size) || 0
-      const left = ship.size - right - 1 || 0
+      if (ship.orientation === ShipOrientation.HORIZONTAL) {
+        const middle = ship.shipCellOrder + 1
+        const right = Math.abs(middle - ship.size) || 0
+        const left = ship.size - right - 1 || 0
 
-      board.dropShip.apply(board, [ship, cell, left, right])
+        board.dropShip.apply(board, [ship, cell, left, right])
+      }
     },
     [board]
   )

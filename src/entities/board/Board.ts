@@ -1,6 +1,6 @@
 import { Cell } from './Cell.ts'
 import { Fleet } from './Fleet.ts'
-import { Ship } from './figures/Ship.ts'
+import { Ship, ShipOrientation } from './figures/Ship.ts'
 import { GameMode } from './GameMode.enum.ts'
 
 export class Board {
@@ -61,12 +61,19 @@ export class Board {
   /**
    * @param ship - ship to drag
    * @param cell - cell on which the drop event was triggered
-   * @param left - number of cells to the left of the target cell
-   * @param right - number of cells to the right of the target cell
+   * @param prev - number of the previous cells to the target cell
+   * @param next - number of the next cells to the target cell
    * @returns {true} if the ship can be successfully placed
    */
-  public dropShip(ship: Ship, cell: Cell, left: number, right: number): boolean {
-    // Horizontal
+  public dropShip(ship: Ship, cell: Cell, prev: number, next: number): boolean {
+    if (ship.orientation === ShipOrientation.HORIZONTAL) {
+      return this.dropHorizontalShip(ship, cell, prev, next)
+    } else {
+      return this.dropVerticalShip(ship, cell, prev, next)
+    }
+  }
+
+  private dropHorizontalShip(ship: Ship, cell: Cell, left: number, right: number): boolean {
     for (let cellRow = 0; cellRow < this.cells.length; cellRow++) {
       if (cellRow !== cell.row) {
         continue
@@ -112,26 +119,40 @@ export class Board {
           return false
         }
 
-        this.placeShip(ship.id, cells)
+        this.placeShip(ship, cells)
       }
     }
-
-    // TODO: Vertical
 
     return true
   }
 
-  private placeShip(shipId: string, cells: Cell[]): boolean {
+  private dropVerticalShip(ship: Ship, cell: Cell, top: number, bottom: number): boolean {
+    // TODO: Vertical
+    console.log(ship, cell, top, bottom)
+    return true
+  }
+
+  private placeShip(ship: Ship, cells: Cell[]): boolean {
     if (!this.isGameStarted) {
       return false
     }
 
-    const isPlaced = this.fleet.placeShip(shipId, cells)
+    // TODO: ???
+    const isPlaced = this.fleet.placeShip(ship.id, cells)
     if (!isPlaced) {
       return false
     }
 
-    // Horizontal
+    if (ship.orientation === ShipOrientation.HORIZONTAL) {
+      this.placeHorizontalShip(cells)
+    } else {
+      this.placeVerticalShip(cells)
+    }
+
+    return true
+  }
+
+  private placeHorizontalShip(cells: Cell[]): boolean {
     for (let row = 0; row < this.cells.length; row++) {
       const firstCell = cells[0]
       if (firstCell.row !== row) {
@@ -200,7 +221,11 @@ export class Board {
       }
     }
 
-    // TODO: Vertical
+    return true
+  }
+
+  private placeVerticalShip(cells: Cell[]): boolean {
+    console.log(cells)
 
     return true
   }
