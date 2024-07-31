@@ -1,5 +1,7 @@
 import { type CSSProperties, type DragEvent, useContext } from 'react'
+import clsx from 'clsx'
 
+import { MapShip } from './MapShip'
 import { DragContext } from '@/context/DragContext'
 import { Cell as CellEntity } from '@/entities/board'
 import styles from './Cell.module.css'
@@ -24,20 +26,18 @@ export const Cell = ({ cell, hitOrMiss, triggerRerender }: Props) => {
 
   const handleDragOver = (ev: DragEvent) => {
     ev.preventDefault()
-
-    // console.log(123)
   }
 
   const handleClick = () => {
-    if (!cell.isEmpty) return
-
     hitOrMiss(cell)
     triggerRerender()
   }
 
   return (
     <div
-      className={styles.root}
+      className={clsx(styles.root, {
+        [styles.placed]: cell.isPlaced
+      })}
       style={{
         backgroundColor: getCellColor(cell)
       }}
@@ -47,6 +47,7 @@ export const Cell = ({ cell, hitOrMiss, triggerRerender }: Props) => {
     >
       {cell.isHit && 'X'}
       {cell.isMiss && '*'}
+      {cell.dependentShip && <MapShip ship={cell.dependentShip} />}
     </div>
   )
 }

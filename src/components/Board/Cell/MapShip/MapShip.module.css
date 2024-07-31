@@ -1,0 +1,14 @@
+.root {
+  --size: 0;
+
+  --gap: 4px;
+  --width: calc(calc(var(--size) * var(--cell-size)) + calc(var(--gap) * var(--size)) - var(--gap));
+
+  height: var(--cell-size);
+  width: var(--width);
+
+  position: absolute;
+  z-index: 1000;
+  outline: 2px solid red;
+  outline-offset: -1px;
+}

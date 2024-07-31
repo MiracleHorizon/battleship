@@ -1,4 +1,5 @@
-import { CSSProperties, useContext, useState } from 'react'
+import { type CSSProperties, type Dispatch, type SetStateAction, useContext, useState } from 'react'
+import clsx from 'clsx'
 
 import { DragContext } from '@/context/DragContext.tsx'
 import { Ship as ShipEntity } from '@/entities/board/figures/Ship.ts'
@@ -8,9 +9,18 @@ interface Props<T extends ShipEntity> {
   ship: T
 }
 
-const ShipCell = ({ setMouseCell, index }: { index: number; setMouseCell: any }) => {
+// TODO: Touch events
+const ShipCell = ({
+  setMouseCell,
+  index
+}: {
+  index: number
+  setMouseCell: Dispatch<SetStateAction<number>>
+}) => {
+  const handleMouseDown = () => setMouseCell(index)
+
   return (
-    <div onMouseDown={() => setMouseCell(index)} className={styles.cell}>
+    <div onMouseDown={handleMouseDown} className={styles.cell}>
       {index}
     </div>
   )
@@ -37,8 +47,10 @@ export const Ship = <T extends ShipEntity>({ ship }: Props<T>) => {
 
   return (
     <div
-      draggable
-      className={styles.root}
+      draggable={!ship.isPlaced}
+      className={clsx(styles.root, {
+        [styles.placed]: ship.isPlaced
+      })}
       style={style}
       data-ship={ship.type}
       onDragStart={handleDragStart}

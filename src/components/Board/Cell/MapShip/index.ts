@@ -1,0 +1,1 @@
+export { MapShip } from './MapShip'

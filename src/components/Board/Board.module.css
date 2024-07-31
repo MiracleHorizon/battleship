@@ -1,13 +1,29 @@
 .root {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
+  flex-direction: column;
   width: 100dvw;
   height: 100dvh;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+}
+
+.footer {
+  margin-top: 40px;
 }
 
 .map {
   display: flex;
   gap: 4px;
   transform: rotate(-90deg) scale(-1, 1);
+}
+
+.row {
+  position: relative;
 }

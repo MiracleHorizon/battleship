@@ -1,4 +1,5 @@
 .root {
+  position: relative;
   width: var(--cell-size);
   height: var(--cell-size);
   outline: 1px solid black;
@@ -7,8 +8,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
 
-  color: red;
-  font-size: 40px;
-  text-align: center;
+.placed {
+  outline-color: white;
 }

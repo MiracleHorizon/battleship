@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { Cell } from './Cell'
 import { Port } from './Port'
@@ -14,6 +14,11 @@ export const Board = () => {
   const rerender = useState(0)[1]
   const triggerRerender = () => rerender(prevState => prevState + 1)
 
+  const handleStartGame = () => {
+    board.startGame()
+    triggerRerender()
+  }
+
   const dropShip = useCallback(
     (ship: DragShip, cell: CellEntity) => {
       if (ship.orientation === ShipOrientation.HORIZONTAL) {
@@ -27,30 +32,53 @@ export const Board = () => {
     [board]
   )
 
-  useEffect(() => {
-    board.startGame()
-  }, [board])
-
   return (
     <div className={styles.root}>
-      <DragContextProvider value={{ ship: dragShip, setShip: setDragShip, dropShip }}>
-        <Port fleet={board.fleet} />
+      <main className={styles.content}>
+        <DragContextProvider
+          value={{
+            ship: dragShip,
+            setShip: setDragShip,
+            dropShip,
+            rotateShip: board.rotateShip.bind(board)
+          }}
+        >
+          <Port fleet={board.fleet} />
 
-        <div className={styles.map}>
-          {board.cells.map((cellRow, index) => (
-            <div key={index}>
-              {cellRow.map(cell => (
-                <Cell
-                  key={cell.id}
-                  cell={cell}
-                  hitOrMiss={board.hitOrMiss.bind(board)}
-                  triggerRerender={triggerRerender}
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      </DragContextProvider>
+          <div className={styles.map}>
+            {board.cells.map((cellRow, index) => (
+              <div key={index} className={styles.row}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-30px',
+                    left: '15px',
+                    color: 'black',
+                    transform: 'rotate(-90deg) scale(-1, 1)'
+                  }}
+                >
+                  {cellRow[0].row}
+                </div>
+
+                {cellRow.map(cell => (
+                  <Cell
+                    key={cell.id}
+                    cell={cell}
+                    hitOrMiss={board.hitOrMiss.bind(board)}
+                    triggerRerender={triggerRerender}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </DragContextProvider>
+      </main>
+
+      <footer className={styles.footer}>
+        <button disabled={board.gameStarted} onClick={handleStartGame}>
+          Start
+        </button>
+      </footer>
     </div>
   )
 }

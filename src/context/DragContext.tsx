@@ -11,10 +11,12 @@ export const DragContext = createContext<{
   ship: DragShip | null
   setShip: (ship: DragShip | null) => void
   dropShip: (ship: DragShip, cell: Cell) => void
+  rotateShip: (ship: Ship) => void
 }>({
   ship: null,
   setShip() {},
-  dropShip() {}
+  dropShip() {},
+  rotateShip() {}
 })
 
 export const DragContextProvider = DragContext.Provider

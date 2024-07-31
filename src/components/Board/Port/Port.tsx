@@ -17,13 +17,9 @@ export const Port = ({ fleet }: Props) => {
     <section className={styles.root}>
       {categories.map((category, index) => (
         <div key={index} className={styles.berth}>
-          {category.map(ship => {
-            if (ship.isPlaced) {
-              return null
-            }
-
-            return <Ship key={ship.id} ship={ship} />
-          })}
+          {category.map(ship => (
+            <Ship key={ship.id} ship={ship} />
+          ))}
         </div>
       ))}
     </section>
