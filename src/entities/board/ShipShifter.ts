@@ -139,7 +139,7 @@ export class ShipShifter {
           const cell = prevRow[col]
 
           if (
-            cell.isEmpty &&
+            !cell.isPlaced &&
             cell.column >= firstCell.column - 1 &&
             cell.column <= lastCell.column + 1
           ) {
@@ -157,7 +157,7 @@ export class ShipShifter {
         if (cell.column === firstCell.column && cell.column !== 0) {
           const prevCell = currRow[col - 1]
 
-          if (prevCell.isEmpty) {
+          if (!prevCell.isPlaced) {
             prevCell.reserve(this.ship.id)
           }
         }
@@ -166,7 +166,7 @@ export class ShipShifter {
         if (cell.column === lastCell.column && cell.column !== currRow.length - 1) {
           const nextCell = currRow[col + 1]
 
-          if (nextCell.isEmpty) {
+          if (!nextCell.isPlaced) {
             nextCell.reserve(this.ship.id)
           }
         }
@@ -180,7 +180,7 @@ export class ShipShifter {
           const cell = nextRow[col]
 
           if (
-            cell.isEmpty &&
+            !cell.isPlaced &&
             cell.column >= firstCell.column - 1 &&
             cell.column <= lastCell.column + 1
           ) {
