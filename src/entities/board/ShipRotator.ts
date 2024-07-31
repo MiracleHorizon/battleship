@@ -27,7 +27,6 @@ export class ShipRotator {
     }
   }
 
-  // TODO: Проверка на то, хватает ли снизу вообще клеток
   private horizontalToVertical(): boolean {
     /*
         | 0  0  0  0 |      | 0  0  0  0 |
@@ -38,7 +37,7 @@ export class ShipRotator {
     */
 
     const shipCells = this.fleet.getShipCells(this.ship)
-    const firstCell = shipCells[0] // TODO: Unshift?
+    const firstCell = shipCells[0]
 
     if (firstCell.row + this.ship.size > this.cellMatrix[firstCell.row].length) {
       return false
@@ -61,7 +60,6 @@ export class ShipRotator {
           continue
         }
 
-        // TODO: Comment
         if (!cell.isEmpty) {
           return false
         }
@@ -107,8 +105,10 @@ export class ShipRotator {
             cell.column >= firstCell.column - 1 &&
             cell.column <= lastCell.column + 1
           ) {
-            cell.reset()
-            cell.unreserve(this.ship.id)
+            const isReserved = cell.unreserve(this.ship.id)
+            if (!isReserved) {
+              cell.reset()
+            }
           }
         }
       }
@@ -123,8 +123,10 @@ export class ShipRotator {
           const prevCell = currRow[col - 1]
 
           if (!prevCell.isEmpty) {
-            prevCell.unreserve(this.ship.id)
-            prevCell.reset()
+            const isReserved = prevCell.unreserve(this.ship.id)
+            if (!isReserved) {
+              prevCell.reset()
+            }
           }
         }
 
@@ -133,8 +135,10 @@ export class ShipRotator {
           const nextCell = currRow[col + 1]
 
           if (!nextCell.isEmpty) {
-            nextCell.reset()
-            nextCell.unreserve(this.ship.id)
+            const isReserved = nextCell.unreserve(this.ship.id)
+            if (!isReserved) {
+              nextCell.reset()
+            }
           }
         }
       }
@@ -155,8 +159,10 @@ export class ShipRotator {
             cell.column >= firstCell.column - 1 &&
             cell.column <= lastCell.column + 1
           ) {
-            cell.reset()
-            cell.unreserve(this.ship.id)
+            const isReserved = cell.unreserve(this.ship.id)
+            if (!isReserved) {
+              cell.reset()
+            }
           }
         }
       }
@@ -218,8 +224,10 @@ export class ShipRotator {
     */
 
     const shipCells = this.fleet.getShipCells(this.ship)
-    const firstCell = shipCells[0] // TODO: Unshift?
+    const firstCell = shipCells[0]
     const lastCell = shipCells[shipCells.length - 1]
+    const rowLength = this.cellMatrix[firstCell.row].length
+    const colLength = rowLength
 
     // Check that ship can be rotated.
     const newCells: Cell[] = []
@@ -234,47 +242,40 @@ export class ShipRotator {
         continue
       }
 
-      // TODO: Comment
       if (!cell.isEmpty) {
         return false
       }
       newCells.push(cell)
     }
 
-    // TODO: Cringe
-    let prevRow = firstCell.row - 1
-    let prevCol = firstCell.column - 1
-    if (prevRow < 0) prevRow = 0
-    if (prevCol < 0) prevCol = 0
+    const prevRow = Math.max(firstCell.row - 1, 0)
+    const prevCol = Math.max(firstCell.column - 1, 0)
 
     // Unreserve all reserved cells around the ship.
-    const lastRow = Math.min(lastCell.row + 1, this.cellMatrix[lastCell.row].length - 1) + 1
+    const lastRow = Math.min(lastCell.row + 1, rowLength - 1) + 1
 
     for (let row = prevRow; row < lastRow; row++) {
       for (let col = prevCol; col <= firstCell.column + 1; col++) {
         const cell = this.cellMatrix[row][col]
 
         if (!cell.isPlaced) {
-          cell.reset()
-          cell.unreserve(this.ship.id)
+          const isReserved = cell.unreserve(this.ship.id)
+          if (!isReserved) {
+            cell.reset()
+          }
         }
       }
     }
-
-    // TODO: Проверка на диагональ
 
     this.resetShipPreviousCells(shipCells)
     this.placeShipToNewCells(newCells)
     this.ship.rotate(newCells)
 
     // Reserve new cells around the ship.
+    const lastCol = Math.min(firstCell.column + this.ship.size, colLength - 1)
+
     for (let row = prevRow; row <= firstCell.row + 1; row++) {
-      for (
-        let col = prevCol;
-        col <=
-        Math.min(firstCell.column + this.ship.size, this.cellMatrix[firstCell.row].length - 1);
-        col++
-      ) {
+      for (let col = prevCol; col <= lastCol; col++) {
         const cell = this.cellMatrix[row][col]
 
         if (!cell.isPlaced) {
@@ -292,10 +293,11 @@ export class ShipRotator {
    */
   private placeShipToNewCells(newCells: Cell[]): void {
     for (const cell of newCells) {
-      // TODO: Checkout
-      if (!cell.isEmpty) {
-        cell.reset()
-        cell.unreserve(this.ship.id)
+      if (!cell.isPlaced) {
+        const isReserved = cell.unreserve(this.ship.id)
+        if (!isReserved) {
+          cell.reset()
+        }
       }
 
       cell.placeShip()
@@ -310,9 +312,10 @@ export class ShipRotator {
     for (let i = 1; i < cells.length; i++) {
       const cell = cells[i]
 
-      // TODO: Checkout
-      cell.reset()
-      cell.unreserve(this.ship.id)
+      const isReserved = cell.unreserve(this.ship.id)
+      if (!isReserved) {
+        cell.reset()
+      }
     }
   }
 }
