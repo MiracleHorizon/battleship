@@ -40,6 +40,10 @@ export class ShipRotator {
     const shipCells = this.fleet.getShipCells(this.ship)
     const firstCell = shipCells[0] // TODO: Unshift?
 
+    if (firstCell.row + this.ship.size > this.cellMatrix[firstCell.row].length) {
+      return false
+    }
+
     // Check that ship can be rotated.
     const newCells: Cell[] = []
     const lastRow = Math.min(firstCell.row + this.ship.size, this.cellMatrix[firstCell.row].length)
