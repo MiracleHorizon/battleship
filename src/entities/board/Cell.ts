@@ -3,17 +3,25 @@ import type { Ship } from './figures/Ship'
 export const enum CellState {
   PLACED = 'placed',
   HIT = 'hit',
-  MISS = 'miss',
-  RESERVED = 'reserved'
+  MISS = 'miss'
 }
 
 export class Cell {
+  /**
+   * This field is necessary for convenient tracking of reserved cells.
+   * When the ship turns or moves, the cells it has reserved around itself must be cleared.
+   * However, it is not the only one that can reserve them.
+   */
+  private readonly reservedBy: Set<string>
   private state: CellState | null
 
   public readonly column: number
   public readonly row: number
 
   public isEmpty: boolean
+  /**
+   *  This field is required to render the ship component in its first cell on the board.
+   */
   public dependentShip: Ship | null
 
   public get id(): string {
@@ -33,7 +41,7 @@ export class Cell {
   }
 
   public get isReserved(): boolean {
-    return this.state === CellState.RESERVED
+    return this.reservedBy.size > 0
   }
 
   constructor(column: number, row: number) {
@@ -42,6 +50,7 @@ export class Cell {
     this.state = null
     this.isEmpty = true
     this.dependentShip = null
+    this.reservedBy = new Set()
   }
 
   public reset(): void {
@@ -68,9 +77,16 @@ export class Cell {
     this.state = CellState.MISS
   }
 
-  public reserve(): void {
+  public reserve(shipId: string): void {
+    // TODO: Checkout isEmpty
     this.isEmpty = false
-    this.state = CellState.RESERVED
+    this.reservedBy.add(shipId)
+  }
+
+  public unreserve(shipId: string): boolean {
+    this.reservedBy.delete(shipId)
+
+    return this.isReserved
   }
 
   public addDependentShip(ship: Ship): void {

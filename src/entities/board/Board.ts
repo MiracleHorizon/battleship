@@ -148,7 +148,7 @@ export class Board {
     }
 
     if (ship.orientation === ShipOrientation.HORIZONTAL) {
-      this.placeHorizontalShip(cells)
+      this.placeHorizontalShip(ship, cells)
     } else {
       this.placeVerticalShip(cells)
     }
@@ -156,7 +156,7 @@ export class Board {
     return true
   }
 
-  private placeHorizontalShip(cells: Cell[]): boolean {
+  private placeHorizontalShip(ship: Ship, cells: Cell[]): boolean {
     const firstCell = cells[0]
 
     for (let row = 0; row < this.cells.length; row++) {
@@ -177,7 +177,7 @@ export class Board {
             cell.column >= firstCell.column - 1 &&
             cell.column <= lastCell.column + 1
           ) {
-            cell.reserve()
+            cell.reserve(ship.id)
           }
         }
       }
@@ -192,7 +192,7 @@ export class Board {
           const prevCell = currRow[col - 1]
 
           if (prevCell.isEmpty) {
-            prevCell.reserve()
+            prevCell.reserve(ship.id)
           }
         }
 
@@ -201,7 +201,7 @@ export class Board {
           const nextCell = currRow[col + 1]
 
           if (nextCell.isEmpty) {
-            nextCell.reserve()
+            nextCell.reserve(ship.id)
           }
         }
       }
@@ -218,7 +218,7 @@ export class Board {
             cell.column >= firstCell.column - 1 &&
             cell.column <= lastCell.column + 1
           ) {
-            cell.reserve()
+            cell.reserve(ship.id)
           }
         }
       }
@@ -285,6 +285,7 @@ export class Board {
     for (const cell of newCells) {
       if (!cell.isEmpty) {
         cell.reset()
+        cell.unreserve(ship.id)
       }
       cell.placeShip()
     }
@@ -309,6 +310,7 @@ export class Board {
             cell.column <= lastCell.column + 1
           ) {
             cell.reset()
+            cell.unreserve(ship.id)
           }
         }
       }
@@ -323,6 +325,7 @@ export class Board {
           const prevCell = currRow[col - 1]
 
           if (!prevCell.isEmpty) {
+            prevCell.unreserve(ship.id)
             prevCell.reset()
           }
         }
@@ -333,6 +336,7 @@ export class Board {
 
           if (!nextCell.isEmpty) {
             nextCell.reset()
+            nextCell.unreserve(ship.id)
           }
         }
       }
@@ -354,6 +358,7 @@ export class Board {
             cell.column <= lastCell.column + 1
           ) {
             cell.reset()
+            cell.unreserve(ship.id)
           }
         }
       }
@@ -364,7 +369,9 @@ export class Board {
       if (i === 0) continue
 
       const cell = shipCells[i]
+
       cell.reset()
+      cell.unreserve(ship.id)
     }
 
     // Reserve new cells around the ship
@@ -377,7 +384,7 @@ export class Board {
           const cell = prevRow[col]
 
           if (cell.column >= firstCell.column - 1 && cell.column <= firstCell.column + 1) {
-            cell.reserve()
+            cell.reserve(ship.id)
           }
         }
       }
@@ -388,7 +395,7 @@ export class Board {
         const cell = currRow[col]
 
         if (cell.column === firstCell.column - 1 || cell.column === firstCell.column + 1) {
-          cell.reserve()
+          cell.reserve(ship.id)
         }
       }
 
@@ -400,7 +407,7 @@ export class Board {
           const cell = nextRow[col]
 
           if (cell.column >= firstCell.column - 1 && cell.column <= firstCell.column + 1) {
-            cell.reserve()
+            cell.reserve(ship.id)
           }
         }
       }
