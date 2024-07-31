@@ -9,12 +9,12 @@ interface Constructor {
 }
 
 export class ShipRotator {
-  private readonly cellsMatrix: Cell[][]
+  private readonly cellMatrix: Cell[][]
   private readonly fleet: Fleet
   private readonly ship: Ship
 
   constructor({ cellMatrix, fleet, ship }: Constructor) {
-    this.cellsMatrix = cellMatrix
+    this.cellMatrix = cellMatrix
     this.fleet = fleet
     this.ship = ship
   }
@@ -39,16 +39,17 @@ export class ShipRotator {
     const shipCells = this.fleet.getShipCells(this.ship)
     const firstCell = shipCells[0] // TODO: Unshift?
 
-    // Check that ship can be rotated
+    // Check that ship can be rotated.
     const newCells: Cell[] = []
+
     for (let row = firstCell.row; row < firstCell.row + this.ship.size; row++) {
-      for (let col = 0; col < this.cellsMatrix[row].length; col++) {
+      for (let col = 0; col < this.cellMatrix[row].length; col++) {
         if (col !== firstCell.column) continue
 
-        const cell = this.cellsMatrix[row][col]
+        const cell = this.cellMatrix[row][col]
         if (cell.id === firstCell.id) continue
 
-        // Эта клетка зарезервирована, поэтому ее нужно пропустить в ручном режиме
+        // The first ship cell is reserved for rotation, so skip it in manual mode.
         if (cell.row === firstCell.row + 1) {
           newCells.push(cell)
           continue
@@ -61,6 +62,22 @@ export class ShipRotator {
         newCells.push(cell)
       }
     }
+
+    const lastCell = newCells[newCells.length - 1]
+    const nextRow = this.cellMatrix[lastCell.row + 1]
+
+    // Check if the last potential ship placement cell vertically has no cells occupied by another ship.
+    for (const cell of nextRow) {
+      if (cell.column !== firstCell.column - 1 && cell.column !== lastCell.column + 1) {
+        continue
+      }
+
+      if (cell.isPlaced) {
+        return false
+      }
+    }
+
+    // If all expected cells are okay - place ship.
     for (const cell of newCells) {
       if (!cell.isEmpty) {
         cell.reset()
@@ -69,8 +86,8 @@ export class ShipRotator {
       cell.placeShip()
     }
 
-    // Reset all reserved cells around the ship
-    for (let row = 0; row < this.cellsMatrix.length; row++) {
+    // Reset all reserved cells around the ship.
+    for (let row = 0; row < this.cellMatrix.length; row++) {
       if (firstCell.row !== row) continue
 
       // Cells reset
@@ -78,7 +95,7 @@ export class ShipRotator {
 
       // Previous row
       if (row !== 0) {
-        const prevRow = this.cellsMatrix[row - 1]
+        const prevRow = this.cellMatrix[row - 1]
 
         for (let col = 0; col < prevRow.length; col++) {
           const cell = prevRow[col]
@@ -95,7 +112,7 @@ export class ShipRotator {
       }
 
       // Current row
-      const currRow = this.cellsMatrix[row]
+      const currRow = this.cellMatrix[row]
       for (let col = 0; col < currRow.length; col++) {
         const cell = currRow[col]
 
@@ -121,8 +138,8 @@ export class ShipRotator {
       }
 
       // Next row
-      if (row !== this.cellsMatrix.length - 1) {
-        const nextRow = this.cellsMatrix[row + 1]
+      if (row !== this.cellMatrix.length - 1) {
+        const nextRow = this.cellMatrix[row + 1]
 
         for (let col = 0; col < nextRow.length; col++) {
           const cell = nextRow[col]
@@ -143,7 +160,7 @@ export class ShipRotator {
       }
     }
 
-    // Reset previous ship cells, except first
+    // Reset previous ship cells, except first.
     for (let i = 0; i < shipCells.length; i++) {
       if (i === 0) continue
 
@@ -153,11 +170,11 @@ export class ShipRotator {
       cell.unreserve(this.ship.id)
     }
 
-    // Reserve new cells around the ship
+    // Reserve new cells around the ship.
     for (let row = firstCell.row; row < firstCell.row + this.ship.size; row++) {
       // Prev row
       if (row === firstCell.row && row !== 0) {
-        const prevRow = this.cellsMatrix[row - 1]
+        const prevRow = this.cellMatrix[row - 1]
 
         for (let col = 0; col < prevRow.length; col++) {
           const cell = prevRow[col]
@@ -168,8 +185,8 @@ export class ShipRotator {
         }
       }
 
-      // Rows around the ship
-      const currRow = this.cellsMatrix[row]
+      // Rows around the ship.
+      const currRow = this.cellMatrix[row]
       for (let col = 0; col < currRow.length; col++) {
         const cell = currRow[col]
 
@@ -178,9 +195,9 @@ export class ShipRotator {
         }
       }
 
-      // Next row
-      if (row === firstCell.row + this.ship.size - 1 && row !== this.cellsMatrix.length - 1) {
-        const nextRow = this.cellsMatrix[row + 1]
+      // Next row.
+      if (row === firstCell.row + this.ship.size - 1 && row !== this.cellMatrix.length - 1) {
+        const nextRow = this.cellMatrix[row + 1]
 
         for (let col = 0; col < nextRow.length; col++) {
           const cell = nextRow[col]
@@ -198,6 +215,14 @@ export class ShipRotator {
   }
 
   private rotateVerticalShip(): boolean {
+    /*
+        | 0  0  0  0 |      | 0  0  0  0 |
+        | 0  1  0  0 |      | 0  1  1  1 |
+        | 0  1  0  0 |  ->  | 0  0  0  0 |
+        | 0  1  0  0 |      | 0  0  0  0 |
+        | 0  0  0  0 |      | 0  0  0  0 |
+    */
+
     return false
   }
 }
