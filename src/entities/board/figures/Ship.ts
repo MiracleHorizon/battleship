@@ -37,7 +37,7 @@ export abstract class Ship {
     this.cells = []
   }
 
-  public rotate(): void {
+  public rotate(newCells: Cell[]): void {
     if (this.orientation === ShipOrientation.HORIZONTAL) {
       this.orientation = ShipOrientation.VERTICAL
     } else {
@@ -46,6 +46,7 @@ export abstract class Ship {
 
     // TODO: Checkout
     this.cells.length = 1
+    this.cells.push(...newCells)
   }
 
   public place(cells: Cell[]): void {
