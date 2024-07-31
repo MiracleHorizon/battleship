@@ -2,10 +2,10 @@ import { Cell } from './Cell.ts'
 import { Fleet } from './Fleet.ts'
 import { Ship, ShipOrientation } from './figures/Ship.ts'
 import { GameMode } from './GameMode.enum.ts'
+import { ShipShifter } from './ShipShifter.ts'
 
 export class Board {
   private readonly BOARD_SIZE: number = 10
-
   private isGameStarted: boolean
 
   public readonly cells: Cell[][]
@@ -58,7 +58,6 @@ export class Board {
     return this.fleet.hitOrMiss(cell)
   }
 
-  // TODO: Rename?
   /**
    * @param ship - ship to drag.
    * @param cell - cell on which the drop event was triggered.
@@ -66,6 +65,7 @@ export class Board {
    * @param next - number of the next cells to the target cell.
    * @returns {true} if the ship can be successfully placed.
    */
+  // TODO: Rename?
   public dropShip(ship: Ship, cell: Cell, prev: number, next: number): boolean {
     /*
      * Ships can be placed only when the game is not started.
@@ -74,163 +74,16 @@ export class Board {
       return false
     }
 
-    if (ship.orientation === ShipOrientation.HORIZONTAL) {
-      return this.dropHorizontalShip(ship, cell, prev, next)
-    } else {
-      return this.dropVerticalShip(ship, cell, prev, next)
-    }
-  }
+    const shipShifter = new ShipShifter({
+      cellMatrix: this.cells,
+      fleet: this.fleet,
+      ship,
+      cell,
+      prev,
+      next
+    })
 
-  private dropHorizontalShip(ship: Ship, cell: Cell, left: number, right: number): boolean {
-    for (let cellRow = 0; cellRow < this.cells.length; cellRow++) {
-      if (cellRow !== cell.row) {
-        continue
-      }
-
-      const row = this.cells[cellRow]
-
-      for (let cellCol = 0; cellCol < row.length; cellCol++) {
-        if (cellCol !== cell.column) {
-          continue
-        }
-        if (cell.isReserved || cellCol + right > row.length - 1 || cellCol - left < 0) {
-          return false
-        }
-
-        const cells: Cell[] = [cell]
-
-        // Prev cells
-        let pointer = cellCol - 1
-        while (pointer >= cellCol - left) {
-          const prevCell = row[pointer--]
-
-          if (!prevCell.isEmpty) {
-            return false
-          }
-
-          cells.unshift(prevCell)
-        }
-
-        // Next cells
-        pointer = cellCol + 1
-        while (pointer <= cellCol + right) {
-          const nextCell = row[pointer++]
-
-          if (!nextCell.isEmpty) {
-            return false
-          }
-
-          cells.push(nextCell)
-        }
-
-        if (cells.length < ship.size) {
-          return false
-        }
-
-        this.placeShip(ship, cells)
-      }
-    }
-
-    return true
-  }
-
-  private dropVerticalShip(ship: Ship, cell: Cell, top: number, bottom: number): boolean {
-    // TODO: Vertical
-    console.log(ship, cell, top, bottom)
-    return true
-  }
-
-  private placeShip(ship: Ship, cells: Cell[]): boolean {
-    // TODO: ???
-    const isPlaced = this.fleet.placeShip(ship.id, cells)
-    if (!isPlaced) {
-      return false
-    }
-
-    if (ship.orientation === ShipOrientation.HORIZONTAL) {
-      this.placeHorizontalShip(ship, cells)
-    } else {
-      this.placeVerticalShip(cells)
-    }
-
-    return true
-  }
-
-  private placeHorizontalShip(ship: Ship, cells: Cell[]): boolean {
-    const firstCell = cells[0]
-
-    for (let row = 0; row < this.cells.length; row++) {
-      if (firstCell.row !== row) continue
-
-      // Cells reserving
-      const lastCell = cells[cells.length - 1]
-
-      // Previous row
-      if (row !== 0) {
-        const prevRow = this.cells[row - 1]
-
-        for (let col = 0; col < prevRow.length; col++) {
-          const cell = prevRow[col]
-
-          if (
-            cell.isEmpty &&
-            cell.column >= firstCell.column - 1 &&
-            cell.column <= lastCell.column + 1
-          ) {
-            cell.reserve(ship.id)
-          }
-        }
-      }
-
-      // Current row
-      const currRow = this.cells[row]
-      for (let col = 0; col < currRow.length; col++) {
-        const cell = currRow[col]
-
-        // Reserve prev cell if exists
-        if (cell.column === firstCell.column && cell.column !== 0) {
-          const prevCell = currRow[col - 1]
-
-          if (prevCell.isEmpty) {
-            prevCell.reserve(ship.id)
-          }
-        }
-
-        // Reserve next cell if exists
-        if (cell.column === lastCell.column && cell.column !== currRow.length - 1) {
-          const nextCell = currRow[col + 1]
-
-          if (nextCell.isEmpty) {
-            nextCell.reserve(ship.id)
-          }
-        }
-      }
-
-      // Next row
-      if (row !== this.cells.length - 1) {
-        const nextRow = this.cells[row + 1]
-
-        for (let col = 0; col < nextRow.length; col++) {
-          const cell = nextRow[col]
-
-          if (
-            cell.isEmpty &&
-            cell.column >= firstCell.column - 1 &&
-            cell.column <= lastCell.column + 1
-          ) {
-            cell.reserve(ship.id)
-          }
-        }
-      }
-    }
-
-    return true
-  }
-
-  private placeVerticalShip(cells: Cell[]): boolean {
-    console.log(cells)
-
-    return true
+    return shipShifter.shift()
   }
 
   public rotateShip(ship: Ship): boolean {
@@ -241,14 +94,18 @@ export class Board {
       return false
     }
 
-    if (ship.orientation === ShipOrientation.HORIZONTAL) {
-      this.rotateHorizontalShip(ship)
+    if (ship.size === 1) {
+      return true
     }
 
-    return true
+    if (ship.orientation === ShipOrientation.HORIZONTAL) {
+      return this.rotateHorizontalShip(ship)
+    } else {
+      return this.rotateVerticalShip()
+    }
   }
 
-  private rotateHorizontalShip(ship: Ship) {
+  private rotateHorizontalShip(ship: Ship): boolean {
     /*
         | 0  0  0  0 |      | 0  0  0  0 |
         | 0  1  1  1 |      | 0  1  0  0 |
@@ -414,5 +271,11 @@ export class Board {
     }
 
     ship.rotate()
+
+    return true
+  }
+
+  private rotateVerticalShip(): boolean {
+    return false
   }
 }
