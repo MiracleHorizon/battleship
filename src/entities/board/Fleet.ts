@@ -4,7 +4,7 @@ import { Battleship } from './figures/Battleship.ts'
 import { Cruiser } from './figures/Cruiser.ts'
 import { Destroyer } from './figures/Destroyer.ts'
 import { Boat } from './figures/Boat.ts'
-import { ShipOrientation } from './figures/Ship.ts'
+import { type Ship, ShipOrientation } from './figures/Ship.ts'
 import { GameMode } from './GameMode.enum.ts'
 
 type FleetShip = Carrier | Battleship | Cruiser | Destroyer | Boat
@@ -152,5 +152,15 @@ export class Fleet {
 
     cellToHit.miss()
     return false
+  }
+
+  public getShipCells(s: Ship): Cell[] {
+    for (const ship of this.ships) {
+      if (ship.id === s.id) {
+        return ship.cells
+      }
+    }
+
+    return []
   }
 }

@@ -1,3 +1,5 @@
+import type { Ship } from './figures/Ship'
+
 export const enum CellState {
   PLACED = 'placed',
   HIT = 'hit',
@@ -10,7 +12,9 @@ export class Cell {
 
   public readonly column: number
   public readonly row: number
+
   public isEmpty: boolean
+  public dependentShip: Ship | null
 
   public get id(): string {
     return this.column + this.row.toString()
@@ -37,11 +41,16 @@ export class Cell {
     this.row = row
     this.state = null
     this.isEmpty = true
+    this.dependentShip = null
   }
 
   public reset(): void {
     this.isEmpty = true
     this.state = null
+
+    if (this.dependentShip) {
+      this.removeDependentShip()
+    }
   }
 
   public placeShip(): void {
@@ -62,5 +71,13 @@ export class Cell {
   public reserve(): void {
     this.isEmpty = false
     this.state = CellState.RESERVED
+  }
+
+  public addDependentShip(ship: Ship): void {
+    this.dependentShip = ship
+  }
+
+  private removeDependentShip(): void {
+    this.dependentShip = null
   }
 }

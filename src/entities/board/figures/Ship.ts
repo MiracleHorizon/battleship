@@ -43,6 +43,9 @@ export abstract class Ship {
     } else {
       this.orientation = ShipOrientation.HORIZONTAL
     }
+
+    // TODO: Checkout
+    this.cells.length = 1
   }
 
   public place(cells: Cell[]): void {
@@ -52,6 +55,8 @@ export abstract class Ship {
     for (const cell of cells) {
       cell.placeShip()
     }
+
+    this.cells[0].addDependentShip(this)
   }
 
   public unplace(): void {
