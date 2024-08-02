@@ -1,23 +1,49 @@
-import { useRef } from 'react'
+import { useEffect } from 'react'
+import { io } from 'socket.io-client'
 
-import { Board } from '../Board'
+import { Board } from '@/components/Board'
 import { PrepareContextProvider } from '@/context/PrepareContext'
 import { useRoom } from '@/hooks/useRoom'
 import { useGameActions } from '@/hooks/useGameActions'
 import { useRoomActions } from '@/hooks/useRoomActions'
-import { Battlefield } from '@/entities/board/Battlefield'
+import { usePrepare } from '@/hooks/usePrepare'
+import { SERVER_API, socketConfig } from '@/api/config'
 import { WsEvent } from '@/api/events'
+import type { Grid } from '@/context/GameContext'
 import styles from './Layout.module.css'
 
-const defaultBattlefield = new Battlefield()
-
 export const Layout = () => {
-  const battlefield = useRef(defaultBattlefield)
+  const { battlefield } = usePrepare()
   const { socket, room } = useRoom()
-  const { setRoom } = useRoomActions()
-  const { addGrid } = useGameActions()
+  const { setSocket, setRoom, setEnemySocketId } = useRoomActions()
+  const { addGrid, endGame } = useGameActions()
 
-  const setBattlefield = (bf: Battlefield) => (battlefield.current = bf)
+  useEffect(() => {
+    const socket = io(SERVER_API, socketConfig)
+
+    socket.connect()
+    setSocket(socket)
+
+    socket.on(WsEvent.USER_JOINED, (connectedSocketId: string) => {
+      setEnemySocketId(connectedSocketId)
+    })
+    socket.on(WsEvent.RECEIVE_BATTLEFIELD, (grid: Grid | null) => {
+      if (!grid) return
+
+      // Enemy`s grid
+      addGrid(grid)
+    })
+
+    return () => {
+      socket.off(WsEvent.USER_JOINED)
+      socket.off(WsEvent.ADD_BATTLEFIELD)
+      socket.off(WsEvent.RECEIVE_BATTLEFIELD)
+
+      endGame()
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleHandleToRoom = () => {
     if (!socket) return
@@ -34,7 +60,7 @@ export const Layout = () => {
   const handleReady = () => {
     if (!socket || !room) return
 
-    const matrix = battlefield.current.matrix
+    const matrix = battlefield.matrix
     const payload = {
       roomId: room,
       socketId: socket.id,
@@ -53,12 +79,7 @@ export const Layout = () => {
     <div className={styles.root}>
       <header className={styles.header}></header>
 
-      <PrepareContextProvider
-        value={{
-          battlefield: battlefield.current,
-          setBattlefield
-        }}
-      >
+      <PrepareContextProvider>
         <Board />
       </PrepareContextProvider>
 

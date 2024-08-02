@@ -1,8 +1,9 @@
-import { type CSSProperties, type DragEvent, useContext } from 'react'
+import type { CSSProperties, DragEvent } from 'react'
 
 import { CellShip } from './CellShip'
 import { TableCell } from '@/components/TableCell'
-import { DragContext } from '@/context/DragContext'
+import { useDrag } from '@/hooks/useDrag'
+import { useDragActions } from '@/hooks/useDragActions'
 import { Cell as CellEntity } from '@/entities/board'
 import styles from './Cell.module.css'
 
@@ -13,7 +14,8 @@ interface Props {
 }
 
 export const Cell = ({ cell, hitOrMiss, triggerRerender }: Props) => {
-  const { ship, setShip, dropShip } = useContext(DragContext)
+  const { ship } = useDrag()
+  const { dropShip, setShip } = useDragActions()
 
   const handleDrop = (ev: DragEvent) => {
     if (!ship) return
