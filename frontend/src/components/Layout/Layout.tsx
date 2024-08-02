@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 
 import { Board } from '@/components/Board'
-import { PrepareContextProvider } from '@/context/PrepareContext'
 import { useRoom } from '@/hooks/useRoom'
 import { useGameActions } from '@/hooks/useGameActions'
 import { useRoomActions } from '@/hooks/useRoomActions'
@@ -79,9 +78,7 @@ export const Layout = () => {
     <div className={styles.root}>
       <header className={styles.header}></header>
 
-      <PrepareContextProvider>
-        <Board />
-      </PrepareContextProvider>
+      <Board />
 
       <footer className={styles.footer}>
         <button onClick={handleHandleToRoom}>Join room</button>
