@@ -1,0 +1,32 @@
+.root {
+  --size: 0;
+
+  cursor: grab;
+  height: var(--cell-size);
+  width: calc(var(--size) * var(--cell-size));
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  outline: 2px solid rgb(40, 40, 40);
+  outline-offset: -2px;
+  background: white;
+}
+
+.placed {
+  cursor: not-allowed;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  opacity: 30%;
+}
+
+.cell {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--cell-size);
+  width: var(--cell-size);
+}

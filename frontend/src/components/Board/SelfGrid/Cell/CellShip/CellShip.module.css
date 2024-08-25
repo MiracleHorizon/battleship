@@ -1,0 +1,24 @@
+.root {
+  --size: 0;
+
+  --gap: 4px;
+  --calc-size: calc(calc(var(--size) * var(--cell-size)) + calc(var(--gap) * var(--size)) - var(--gap));
+
+  border: 1px solid darkgreen;
+
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  background-color: red;
+}
+
+.horizontal {
+  height: var(--cell-size);
+  width: var(--calc-size);
+}
+
+.vertical {
+  height: var(--calc-size);
+  width: var(--cell-size);
+}

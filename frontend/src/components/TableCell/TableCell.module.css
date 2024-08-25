@@ -1,0 +1,26 @@
+.root {
+  cursor: pointer;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  min-width: var(--cell-size);
+  min-height: var(--cell-size);
+  vertical-align: middle;
+  text-align: center;
+}
+
+.empty {
+  background-color: #93a0ff;
+}
+
+.hit {
+  background-color: red;
+}
+
+.missed {
+  background-color: yellow;
+}
+
+.reserved {
+  background-color: palegreen;
+}
+
